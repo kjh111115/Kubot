@@ -2,7 +2,7 @@
 
 DXL dxl("/dev/ttyUSB0",2000000); 
 Kinematics FK;
-
+// abcd
 #define NSEC_PER_SEC 1000000000     // 10^9
 #define EC_TIMEOUTMON 500
 
