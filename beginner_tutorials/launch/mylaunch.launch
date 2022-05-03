@@ -1,0 +1,24 @@
+<!-- launch file use same syntax with xml file ex)package.xml -->
+
+<launch> <!-- launch tag means it is a launch file -->
+
+    <!-- group :   rosnode list : " /mytutorial/talker11" -->
+    <!-- rosrun <pkg> <type>  ex) rosrun beginner_tutorials talker  -->
+    <!-- name = what you see in  "$ rosnode list" -->
+    <!-- output="screen" :  This element tells ROS to display the output to the terminal window -->
+
+
+
+
+  <rosparam command="load" file="$(find beginner_tutorials)/config/param.yaml"/>
+
+  <param name="myparameter" value="3" />
+
+  <group ns="kudos">
+    <node pkg="beginner_tutorials" name="talker" type="talker" output="screen"/>
+    <node pkg="beginner_tutorials" name="listener" type="listener" output="screen"/>
+  </group>
+
+
+
+</launch>
