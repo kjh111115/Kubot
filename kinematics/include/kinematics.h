@@ -22,17 +22,17 @@ using Eigen::VectorXd;
 using Eigen::Vector4d;
 using Eigen::Vector3d;
 
-class Kinematics{
+class Kinematics
+{
 public:
     Matrix4d jointToRotMatX(double roll);
-    Eigen::Matrix4d jointToRotMatY(double pitch);
-    Eigen::Matrix4d jointToRotMatZ(double yaw);
+    Matrix4d jointToRotMatY(double pitch);
+    Matrix4d jointToRotMatZ(double yaw);
     Matrix4d jointToTransMat(Vector3d position);
-    Eigen::VectorXd matToPos(Eigen::Matrix4d tfMat);
-    Eigen::VectorXd matToEuler(Eigen::Matrix4d tfMat);
-    Eigen::VectorXd tfToSole(Eigen::VectorXd jointVar, Eigen::Vector3d linkParam1, Eigen::Vector3d linkParam2, Eigen::Vector3d linkParam3, Eigen::Vector3d linkParam4);
-    Eigen::VectorXd tfToHand(Eigen::VectorXd jointVar, Eigen::Vector3d linkParam1, Eigen::Vector3d linkParam2, Eigen::Vector3d linkParam3);
+    VectorXd matToPos(Matrix4d tfMat);
+    VectorXd matToEuler(Matrix4d tfMat);
+    Matrix4d tfToSole(VectorXd jointVar, Vector3d linkParam1, Vector3d linkParam2, Vector3d linkParam3, Vector3d linkParam4);
+    Matrix4d tfToHand(VectorXd jointVar, Vector3d linkParam1, Vector3d linkParam2, Vector3d linkParam3);
 };
-
 
 #endif // Kinematics

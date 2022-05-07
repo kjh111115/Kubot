@@ -1,14 +1,34 @@
 #include "kinematics.h"
 
+int main(int argc, char **argv)
+{   
+    Kinematics FK;
 
+    Matrix4d BaseToSole;
+    VectorXd JointAngle(6);
+    Vector3d BaseToHip, HipToKnee, KneeToAnkle, AnkleToSole, EPos, EOri;
 
-int main()
-{
-    std::cout << "hi" << std::endl;
+    JointAngle << 10, 20, 30, 40, 50, 60;
+    BaseToHip << 0, 0.05, -0.132;
+    HipToKnee << 0, 0, -0.138;
+    KneeToAnkle << 0, 0, -0.143;
+    AnkleToSole << 0, 0, -0.040;
+
+    JointAngle = JointAngle*M_PI/180;
+
+    // BaseToSole = FK.jointToTransMat(BaseToHip);
+    BaseToSole = FK.tfToSole(JointAngle, BaseToHip, HipToKnee, KneeToAnkle, AnkleToSole);
+    EPos = FK.matToPos(BaseToSole);
+    EOri = FK.matToEuler(BaseToSole);
+
+    std::cout << "Trasnform Matrix(BaseToSole)" << std::endl << BaseToSole << std::endl;
+    std::cout << "Position of End effector" << std::endl << EPos << std::endl;
+    std::cout << "Orientation of End effector" << std::endl << EOri*180/M_PI << std::endl;
+
     return 0;
 }
 
-Matrix4d jointToRotMatX(double roll)
+Matrix4d Kinematics::jointToRotMatX(double roll)
 {
     double q = roll;
 
@@ -19,12 +39,10 @@ Matrix4d jointToRotMatX(double roll)
     tmp_m(2,0) = 0; tmp_m(2,1) = sin(q);    tmp_m(2,2) = cos(q);    tmp_m(2,3) = 0;
     tmp_m(3,0) = 0; tmp_m(3,1) = 0;         tmp_m(3,2) = 0;         tmp_m(3,3) = 1;
 
-    Matrix4d RotX = tmp_m;
-
     return tmp_m;
 }
 
-Matrix4d jointToRotMatY(double pitch)
+Matrix4d Kinematics::jointToRotMatY(double pitch)
 {
     double q = pitch;
 
@@ -34,13 +52,11 @@ Matrix4d jointToRotMatY(double pitch)
     tmp_m(1,0) = 0;         tmp_m(1,1) = 1;     tmp_m(1,2) = 0;         tmp_m(1,3) = 0;
     tmp_m(2,0) = -sin(q);   tmp_m(2,1) = 0;     tmp_m(2,2) = cos(q);    tmp_m(2,3) = 0;
     tmp_m(3,0) = 0;         tmp_m(3,1) = 0;     tmp_m(3,2) = 0;         tmp_m(3,3) = 1;
-
-    Matrix4d RotY = tmp_m;
     
-    return RotY;
+    return tmp_m;
 }
 
-Matrix4d jointToRotMatZ(double yaw)
+Matrix4d Kinematics::jointToRotMatZ(double yaw)
 {
     double q = yaw;
 
@@ -56,7 +72,7 @@ Matrix4d jointToRotMatZ(double yaw)
     return RotZ;
 }
 
-Matrix4d jointToTransMat(Vector3d position)
+Matrix4d Kinematics::jointToTransMat(Vector3d position)
 {
     Matrix4d tmp_m;
     Vector3d tmp_v;
@@ -71,11 +87,10 @@ Matrix4d jointToTransMat(Vector3d position)
     tmp_m(2,0) = 0; tmp_m(2,1) = 0; tmp_m(2,2) = 1; tmp_m(2,3) = tmp_v(2);
     tmp_m(3,0) = 0; tmp_m(3,1) = 0; tmp_m(3,2) = 0; tmp_m(3,3) = 1;
 
-
     return tmp_m;
 }
 
-VectorXd matToPos(Eigen::Matrix4d tfMat)
+VectorXd Kinematics::matToPos(Matrix4d tfMat)
 {
     Vector3d tmp_v;
 
@@ -86,20 +101,18 @@ VectorXd matToPos(Eigen::Matrix4d tfMat)
     return tmp_v;
 }
 
-VectorXd matToEuler(Eigen::Matrix4d tfMat)
+VectorXd Kinematics::matToEuler(Matrix4d tfMat)
 {
-    Vector4d tmp_v;
+    Vector3d tmp_v;
 
     tmp_v(0) = atan2(tfMat(1,0), tfMat(0,0));
     tmp_v(1) = atan2(-tfMat(2,0), sqrt(pow(tfMat(2,1),2)+pow(tfMat(2,2),2)));
     tmp_v(2) = atan2(tfMat(2,1), tfMat(2,2));
-    tmp_v(3) = 1;
     
     return tmp_v;
 }
 
-// How to use vector(6) in EigenLibrary?
-VectorXd tfToSole(Eigen::VectorXd jointVar, Eigen::Vector3d linkParam1, Eigen::Vector3d linkParam2, Eigen::Vector3d linkParam3, Vector3d linkParam4)
+Matrix4d Kinematics::tfToSole(VectorXd jointVar, Vector3d linkParam1, Vector3d linkParam2, Vector3d linkParam3, Vector3d linkParam4)
 {
     MatrixXd tmp_m(4,4);
 
@@ -140,7 +153,7 @@ VectorXd tfToSole(Eigen::VectorXd jointVar, Eigen::Vector3d linkParam1, Eigen::V
     return tmp_m;
 }
 
-VectorXd tfToHand(Eigen::VectorXd jointVar, Eigen::Vector3d linkParam1, Eigen::Vector3d linkParam2, Eigen::Vector3d linkParam3)
+Matrix4d Kinematics::tfToHand(VectorXd jointVar, Vector3d linkParam1, Vector3d linkParam2, Vector3d linkParam3)
 {
     MatrixXd tmp_m(4,4);
 
